@@ -1,0 +1,123 @@
+<html>
+
+<head>
+    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-graph.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-sankey.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.8.0/js/anychart-data-adapter.min.js"></script>
+    <style type="text/css">
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script>
+        anychart.onDocumentReady(function () {
+            var data = {
+                nodes: [
+                    { id: "y4g_src_sb_test-develop", group: "WF", displayName: "Develop - y4g_src_sb_test" },
+                    { id: "y4g_src_sb_test-feature", group: "WF", displayName: "Feature - y4g_src_sb_test" },
+                    { id: "y4g_src_sb_test-release", group: "WF", displayName: "Release - y4g_src_sb_test" },
+
+                    { id: "y4g_central_skycap-develop", group: "CWF", displayName: "Central WF Develop - y4g_central_skycap" },
+                    { id: "y4g_central_skycap-feature", group: "CWF", displayName: "Central WF Feature - y4g_central_skycap" },
+                    { id: "y4g_central_skycap-release", group: "CWF", displayName: "Central WF Release - y4g_central_skycap" },
+
+                    { id: "y4g_actions_common-setup_maven", group: "CA", displayName: "Setup Maven - y4g_actions_common" },
+                    { id: "y4g_actions_common-push_aws", group: "CA", displayName: "Push AWS - y4g_actions_common" },
+
+                    { id: "external-checkout", group: "A", displayName: "Checkout - external" },
+                    { id: "external-azure_login", group: "A", displayName: "Azure Login - external" },
+                    { id: "y4g_actions_maven-setup_maven_action", group: "A", displayName: "Setup Maven action - y4g_actions_maven" },
+                    { id: "external-aws_login", group: "A", displayName: "AWS Login - external" }
+                ],
+                edges: [
+                    { from: "y4g_src_sb_test-develop", to: "y4g_central_skycap-develop" },
+                    { from: "y4g_src_sb_test-feature", to: "y4g_central_skycap-feature" },
+                    { from: "y4g_src_sb_test-release", to: "y4g_central_skycap-release" },
+
+                    { from: "y4g_central_skycap-develop", to: "y4g_actions_common-setup_maven" },
+                    { from: "y4g_central_skycap-develop", to: "y4g_actions_common-push_aws" },
+                    { from: "y4g_central_skycap-develop", to: "external-checkout" },
+
+                    { from: "y4g_central_skycap-feature", to: "y4g_actions_common-setup_maven" },
+                    { from: "y4g_central_skycap-feature", to: "external-checkout" },
+
+                    { from: "y4g_central_skycap-release", to: "y4g_actions_common-setup_maven" },
+                    { from: "y4g_central_skycap-release", to: "y4g_actions_common-push_aws" },
+                    { from: "y4g_central_skycap-release", to: "external-checkout" },
+
+                    { from: "y4g_actions_common-setup_maven", to: "external-azure_login" },
+                    { from: "y4g_actions_common-setup_maven", to: "y4g_actions_maven-setup_maven_action" },
+
+                    { from: "y4g_actions_common-push_aws", to: "external-azure_login" },
+                    { from: "y4g_actions_common-push_aws", to: "external-aws_login" }
+
+                ]
+            };
+
+            // create a chart from the loaded data
+            var chart = anychart.graph(data);
+
+            // set the title
+            chart.title("Network Graph showing dependencies");
+
+            // access nodes
+            var nodes = chart.nodes();
+
+            // set the size of nodes
+            nodes.normal().height(30);
+            nodes.hovered().height(45);
+            nodes.selected().height(45);
+
+            // set the stroke of nodes
+            nodes.normal().stroke(null);
+            nodes.hovered().stroke("#333333", 3);
+            nodes.selected().stroke("#333333", 3);
+
+            // enable the labels of nodes
+            chart.nodes().labels().enabled(true);
+
+            // configure the labels of nodes
+            chart.nodes().labels().format("{%displayName}");
+            chart.nodes().labels().fontSize(12);
+            chart.nodes().labels().fontWeight(600);
+
+            chart.group("WF").labels().format("Workflow\n{%displayName}");
+            chart.group("WF").labels().fontColor("#FF0000");
+            chart.group("WF").normal().fill("#FF0000");
+            // shapes: https://api.anychart.com/v8/anychart.enums.MarkerType
+            chart.group("WF").normal().shape("diamond");
+
+            chart.group("CWF").labels().format("Central Workflow\n{%displayName}");
+            chart.group("CWF").labels().fontColor("#0000FF");
+            chart.group("CWF").normal().fill("#0000FF");
+            chart.group("CWF").normal().shape("circle");
+
+            chart.group("CA").labels().format("Composite Action\n{%displayName}");
+            chart.group("CA").labels().fontColor("#FF00FF");
+            chart.group("CA").normal().fill("#FF00FF");
+            chart.group("CA").normal().shape("pentagon");
+
+            chart.group("A").labels().format("Action\n{%displayName}");
+            chart.group("A").labels().fontColor("#00FF00");
+            chart.group("A").normal().fill("#00FF00");
+            chart.group("A").normal().shape("square");
+
+            chart.layout().iterationCount(0);
+
+            // draw the chart
+            chart.container("container").draw();
+        });
+    </script>
+</body>
+
+</html>
